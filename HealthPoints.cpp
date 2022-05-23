@@ -24,6 +24,6 @@ bool HealthPoints::operator!=(const HealthPoints& hp1, const HealthPoints& hp2) 
 }
 
 std::ostream& operator<<(std::ostream& os, const HealthPoints& hp) {
-    os << hp.m_healthHp<<'('<<hp.m_maxHp<<')'
+    os << hp.m_healthHp<<'('<<hp.m_maxHp<<')';
     return os;
 }
