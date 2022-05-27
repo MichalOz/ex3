@@ -1,6 +1,7 @@
 #ifndef EX3_QUEUE_H
 #define EX3_QUEUE_H
 typedef int T;
+const EXPAND_RATE = 2;
 
 //template <class T>
 class Queue {
@@ -11,30 +12,40 @@ private:
 
 
 public:
-//    void pushBack(<T> itemToPush);
-    void pushBack(T itemToPush);
 
-//helper  to push back- our func
+//template <class T>
+    bool pushBack(const T item);
+
+//<template class T>
     void expand();
 
     int size() const;
 
+    T front() const;
+
     void popFront();
 
-    T front();
+    void moveOneLeft();
 
-    explicit Queue(int maxSize = 100);
+    void minimize();
 
-    Queue(const Queue &q);
+    explicit Queue(int size = EXPAND_RATE);
 
-    ~Queue();
+    Queue(const Queue &queue);
 
-    Queue& operator=(const Queue &q);
+    Queue &operator=(const Queue &queue);
 
-    class Full {};
-    class Empty {};
-    class InvalidSize {};
+    Queue filter(Queue &queue, FilterFunc filterFunc);
 
+    void transform(Queue &queue, Transform transformOperator);
+
+    ~Queue(); //need to be done
+
+    Queue &operator=(const Queue &q);
+
+    class EmptyQueue {
+    };
 };
 
 #endif //EX3_QUEUE_H
+
