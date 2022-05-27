@@ -5,6 +5,7 @@ const int MAX_HP_DEFAULT = 100;
 class HealthPoints
 {
 public:
+    class InvalidArgument{};
     HealthPoints(int max_hp = MAX_HP_DEFAULT);
     HealthPoints(const HealthPoints& otherHp) = default;
     HealthPoints& operator=(const HealthPoints& otherHp) = default;

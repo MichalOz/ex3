@@ -76,3 +76,63 @@ Queue::Queue(const Queue T& q) :
         throw;
     }
 }
+    Queue::Const_Iterator::Const_Iterator(const Queue* queue, int index) : 
+        m_queue(queue), m_index(index){}
+
+    const T& Queue::Const_Iterator::operator*()
+    {
+        if (m_index>=m_queue->m_lastItemIndex)
+        {
+            throw InvalidOperation();
+        }
+        return m_queue->m_data[m_index];
+    }
+    Queue::Const_Iterator& Queue::Const_Iterator::operator++()
+    {
+        ++m_index;
+        if (m_index>=m_queue->m_lastItemIndex)
+        {
+            throw InvalidOperation();
+        }
+        return *this;
+    }
+    bool Queue::Const_Iterator::operator!=(const Const_Iterator it) const
+    {
+        if(m_queue!=it.m_queue)
+        {
+            throw InvalidOperation();
+        }
+        return m_index!=it.m_index;
+    }
+
+    Queue::Iterator::Iterator(const Queue* queue, int index) : 
+        m_queue(queue), m_index(index){}
+
+    T& Queue::Iterator::operator*()
+    {
+        if (m_index>=m_queue->m_lastItemIndex)
+        {
+            throw InvalidOperation();
+        }
+        return m_queue->m_data[m_index];
+    }
+    Queue::Iterator& Queue::Iterator::operator++()
+    {
+        ++m_index;
+        if (m_index>=m_queue->m_lastItemIndex)
+        {
+            throw InvalidOperation();
+        }
+        return *this;
+    }
+    bool Queue::Iterator::operator!=(const Iterator it) const
+    {
+        if(m_queue!=it.m_queue)
+        {
+            throw InvalidOperation();
+        }
+        return m_index!=it.m_index;
+    }
+    
+
+    
