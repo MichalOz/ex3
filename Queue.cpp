@@ -106,7 +106,7 @@ Queue::Queue(const Queue &queue) {
 
 
 //template <class T>
-Queue &Queue::operator=(const Queue &queue) {
+Queue &operator=(const Queue &queue) {
     if (this == &queue) {
         return *this;
     }
@@ -144,5 +144,9 @@ void Queue::transform(Queue &queue, Transform transformOperator) {
     }
     return queue;
 }
+
+Queue::~Queue() {
+    delete[] m_data;
+};
 
 
