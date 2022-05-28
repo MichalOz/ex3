@@ -1,80 +1,133 @@
 #include "Queue.h"
 
 
-
 ///////
 //template <class T>
-bool Queue::pushBack(T item) {
+void Queue::pushBack(const T itemToPush) 
+{
+    // if item == null ?
     if (m_lastItemIndex >= m_maxSize) {
         expand();
     }
-    data[size++] = item;
-    return true;
+    m_data[m_lastItemIndex] = itemToPush;
+    m_lastItemIndex++;
 }
 
 //<template class T>
-void Queue::expand() {
+void Queue::expand() 
+{
     int newSize = m_maxSize * EXPAND_RATE;
-    T *newData = new T[newSize];
-    for (int i = 0; i < m_maxSize; ++i) {
-        newData[i] = data[i];
+    T *tempData = new T[newSize];
+    try {
+        for (int i = 0; i < m_maxSize; ++i) {
+            tempData[i] = m_data[i];
+        }
     }
-    delete[] data;
-    data = newData;
-    maxSize = newSize;
+    catch (...) {
+        delete[] tempData;
+    }
+    delete[] m_data;
+    m_data = tempData;
+    m_maxSize = newSize;
 }
 
 //<template class T>
-int Queue::size() const {
+int Queue::size() const 
+{
     return m_maxSize;
 }
 
 //<template class T>
-T Queue::front() const {
+T Queue::front() const 
+{
     return m_data[m_lastItemIndex - 1];
 }
 
 
 //<template class T>
-void Queue::popFront() {
-    delete m_data[0];
-    if (m_lastItemIndex - 1 <= 0.5 * m_maxSize) {
+void Queue::popFront() 
+{
+    if (m_lastItemIndex == 0) 
+    {
+        throw EmptyQueue();
+    }
+    moveOneLeft();
+    if (m_lastItemIndex - 1 <= 0.5 * m_maxSize) 
+    {
         minimize();
     }
-    // move all items one place left
+}
+
+void Queue::moveOneLeft() 
+{
+    for (int i = 0; i < m_lastItemIndex - 1; ++i) 
+    {
+        m_data[i] = m_data[i + 1];
+    }
+    m_lastItemIndex--;
 }
 
 void Queue::minimize() {
     // when we use less than half of data space we minimize by 25%
     // given size: 100, when used spaces gets to 49 we minimize size to 75
-    int placeToStopMinimize = m_maxSize * 0.75;
-    for (int i = m_maxSize - 1; i >= placeToStopMinimize; i--) {
-        delete m_data[i];
-    }
+    m_lastItemIndex = m_maxSize * 0.75;
 }
 
 
 //template <class T>
-Queue::Queue(int size) :
-        data(new T[size]), m_maxSize(size),m_lastItemIndex(1){
+//Queue<T>::Queue(int size) {
+Queue::Queue(int size) 
+{
     if (size <= 0) {
-        // fit to default size
-        delete[] data;
-        throw InvalidSize();
+        delete[] m_data;
+        throw EmptyQueue();
     }
+    m_data = new T[size];
+    m_maxSize = size;
+    m_lastItemIndex = 0;
 }
 
 //template <class T>
-Queue::Queue(const Queue T& q) :
-        data(new T[q.m_maxSize]), m_maxSize(q.m_maxSize), m_lastItemIndex(q.m_nextIndex) {
+//Queue<T>::Queue(const Queue& queue){
+Queue::Queue(const Queue &queue) 
+{
+    delete[] m_data;
+    m_data = new int[queue.m_maxSize];
+    m_maxSize = queue.m_maxSize;
+    m_lastItemIndex = queue.m_lastItemIndex;
     try {
-        for (int i = 0; i < nextIndex; ++i) {
-            data[i] = s.data[i];
+        for (int i = 0; i < m_maxSize; i++) {
+            m_data[i] = queue.m_data[i];
+            //need check with michal
         }
-    } catch (...) {
-        delete[] data;
+    }
+    catch (...) 
+    {
+        delete[] m_data;
         throw;
     }
+}
+
+
+//template <class T>
+Queue &operator=(const Queue &queue) {
+    if (this == &queue) {
+        return *this;
+    }
+    T *tempData = new T[queue.m_maxSize];
+    try {
+        m_maxSize = queue.m_maxSize;
+        m_lastItemIndex = queue.m_lastItemIndex;
+        for (int i = 0; i < m_maxSize; ++i) {
+            m_data[i] = queue.m_data[i];
+        }
+    } catch (...) {
+        delete[] tempData;
+        throw;
+    }
+    delete[] data;
+    data = tempData;
+    return *this;
 }
     Queue::Const_Iterator::Const_Iterator(const Queue* queue, int index) : 
         m_queue(queue), m_index(index){}
@@ -136,3 +189,28 @@ Queue::Queue(const Queue T& q) :
     
 
     
+
+Queue Queue::filter(Queue &queue, FilterFunc filterFunc) {
+    // what if given queue smaller
+    Queue newQueue;
+    for (int i = 0; i < queue.m_lastItemIndex; ++i) {
+        if (filterFunc(queue.m_data[i])) {
+            newQueue.pushBack(queue.m_data[i]);
+        }
+    }
+    return newQueue;
+}
+
+void Queue::transform(Queue &queue, Transform transformOperator) {
+    // what if given queue smaller
+    for (int i = 0; i < queue.m_lastItemIndex; ++i) {
+        queue = transformOperator(queue.m_data[i]);
+    }
+    return queue;
+}
+
+Queue::~Queue() {
+    delete[] m_data;
+};
+
+

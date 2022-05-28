@@ -1,12 +1,12 @@
 #ifndef EX3_QUEUE_H
 #define EX3_QUEUE_H
 typedef int T;
+const int EXPAND_RATE = 2;
 
 //template <class T>
 class Queue 
 {
     public:
-
         class Const_Iterator;
         class Iterator;
 
@@ -15,28 +15,24 @@ class Queue
         Const_Iterator const_begin() const;
         Const_Iterator const_end() const;
         void pushBack(T itemToPush);
-
         void expand();
-
         int size() const;
-
+        T front() const;
         void popFront();
+        void moveOneLeft();
+        void minimize();
+        explicit Queue(int size = EXPAND_RATE);
+        Queue(const Queue &queue);
+        Queue &operator=(const Queue &queue);
+        Queue filter(Queue &queue, FilterFunc filterFunc);
+        void transform(Queue &queue, Transform transformOperator);
+        ~Queue(); //need to be done
 
-        T front();
-
-        explicit Queue(int maxSize = 100);
-
-        Queue(const Queue &q);
-
-        ~Queue();
-
-        Queue& operator=(const Queue &q);
-
+        class EmptyQueue {};
         class InvalidSize {};
         class InvalidOperation{};
 
     private:
-
         T *m_data;
         int m_lastItemIndex;
         int m_maxSize;
@@ -57,7 +53,6 @@ class Queue::Const_Iterator
     int m_index;
     Const_Iterator (const Queue* queue, int index);
     friend class Queue;
-    
 };
 
 class Queue::Iterator
@@ -78,3 +73,4 @@ class Queue::Iterator
     
 };
 #endif //EX3_QUEUE_H
+
