@@ -25,6 +25,7 @@ void Queue::expand()
     }
     catch (...) {
         delete[] tempData;
+        throw;
     }
     delete[] m_data;
     m_data = tempData;
@@ -45,8 +46,7 @@ T Queue::front() const
 
 
 //<template class T>
-void Queue::popFront() 
-{
+void Queue::popFront() {
     if (m_lastItemIndex == 0) 
     {
         throw EmptyQueue();
@@ -70,20 +70,16 @@ void Queue::moveOneLeft()
 void Queue::minimize() {
     // when we use less than half of data space we minimize by 25%
     // given size: 100, when used spaces gets to 49 we minimize size to 75
-    m_lastItemIndex = m_maxSize * 0.75;
+    delete[] (m_data+(int)(m_maxSize * 0.75));
+    m_maxSize = m_maxSize * 0.75;
 }
 
 
 //template <class T>
 //Queue<T>::Queue(int size) {
-Queue::Queue(int size) 
-{
-    if (size <= 0) {
-        delete[] m_data;
-        throw EmptyQueue();
-    }
-    m_data = new T[size];
-    m_maxSize = size;
+Queue::Queue() {
+    m_data = new T[INITIAL_SIZE];
+    m_maxSize = INITIAL_SIZE;
     m_lastItemIndex = 0;
 }
 
@@ -91,12 +87,13 @@ Queue::Queue(int size)
 //Queue<T>::Queue(const Queue& queue){
 Queue::Queue(const Queue &queue) 
 {
-    delete[] m_data;
     m_data = new int[queue.m_maxSize];
     m_maxSize = queue.m_maxSize;
     m_lastItemIndex = queue.m_lastItemIndex;
-    try {
-        for (int i = 0; i < m_maxSize; i++) {
+    try 
+    {
+        for (int i = 0; i < m_maxSize; i++) 
+        {
             m_data[i] = queue.m_data[i];
             //need check with michal
         }
@@ -110,7 +107,7 @@ Queue::Queue(const Queue &queue)
 
 
 //template <class T>
-Queue &operator=(const Queue &queue) {
+Queue& Queue::operator=(const Queue &queue) {
     if (this == &queue) {
         return *this;
     }
@@ -125,8 +122,8 @@ Queue &operator=(const Queue &queue) {
         delete[] tempData;
         throw;
     }
-    delete[] data;
-    data = tempData;
+    delete[] m_data;
+    m_data = tempData;
     return *this;
 }
     Queue::Const_Iterator::Const_Iterator(const Queue* queue, int index) : 
@@ -204,9 +201,8 @@ Queue Queue::filter(Queue &queue, FilterFunc filterFunc) {
 void Queue::transform(Queue &queue, Transform transformOperator) {
     // what if given queue smaller
     for (int i = 0; i < queue.m_lastItemIndex; ++i) {
-        queue = transformOperator(queue.m_data[i]);
+        queue.m_data[i] = transformOperator(queue.m_data[i]);
     }
-    return queue;
 }
 
 Queue::~Queue() {

@@ -2,7 +2,7 @@
 #define EX3_QUEUE_H
 typedef int T;
 const int EXPAND_RATE = 2;
-
+const int INITIAL_SIZE = 10;
 //template <class T>
 class Queue 
 {
@@ -14,14 +14,14 @@ class Queue
         Iterator end() const;
         Const_Iterator const_begin() const;
         Const_Iterator const_end() const;
-        void pushBack(T itemToPush);
+        void pushBack(const T itemToPush);
         void expand();
         int size() const;
         T front() const;
         void popFront();
         void moveOneLeft();
         void minimize();
-        explicit Queue(int size = EXPAND_RATE);
+        explicit Queue();
         Queue(const Queue &queue);
         Queue &operator=(const Queue &queue);
         Queue filter(Queue &queue, FilterFunc filterFunc);
