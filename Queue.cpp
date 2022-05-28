@@ -3,14 +3,13 @@
 
 ///////
 //template <class T>
-bool Queue::pushBack(const T item) {
+void Queue::pushBack(const T item) {
     // if item == null ?
     if (m_lastItemIndex >= m_maxSize) {
         expand();
     }
     m_data[m_lastItemIndex] = item;
     m_lastItemIndex++;
-    return true;
 }
 
 //<template class T>
@@ -19,15 +18,16 @@ void Queue::expand() {
     T *tempData = new T[newSize];
     try {
         for (int i = 0; i < m_maxSize; ++i) {
-            tempData[i] = data[i];
+            tempData[i] = m_data[i];
         }
     }
     catch (...) {
         delete[] tempData;
+        throw;
     }
-    delete[] data;
-    data = tempData;
-    maxSize = newSize;
+    delete[] m_data;
+    m_data = tempData;
+    m_maxSize = newSize;
 }
 
 //<template class T>
@@ -43,10 +43,9 @@ T Queue::front() const {
 
 //<template class T>
 void Queue::popFront() {
-    try {
-        if (m_lastItemIndex == 0) {
-            throw EmptyQueue();
-        }
+    if (m_lastItemIndex == 0) 
+    {
+        throw EmptyQueue();
     }
     moveOneLeft();
     if (m_lastItemIndex - 1 <= 0.5 * m_maxSize) {
@@ -64,44 +63,39 @@ void Queue::moveOneLeft() {
 void Queue::minimize() {
     // when we use less than half of data space we minimize by 25%
     // given size: 100, when used spaces gets to 49 we minimize size to 75
-    m_lastItemIndex = m_maxSize * 0.75;
+    delete [] m_data+(m_maxSize * 0.75);
+    m_maxSize = m_maxSize * 0.75;
 }
 
 
 //template <class T>
 //Queue<T>::Queue(int size) {
-Queue::Queue(int size) {
-    if (size <= 0) {
-        delete[] data;
-        throw EmptyQueue();
-    }
-    m_data = new T[size];
-    m_maxSize = size;
+Queue::Queue() {
+    m_data = new T[INITIAL_SIZE];
+    m_maxSize = INITIAL_SIZE;
     m_lastItemIndex = 0;
 }
 
 //template <class T>
 //Queue<T>::Queue(const Queue& queue){
-Queue::Queue(const Queue &queue) {
-
-    if (this == &queue) {
-        return *this;
-    }
-    delete[] m_data;
+Queue::Queue(const Queue &queue) 
+{
     m_data = new int[queue.m_maxSize];
     m_maxSize = queue.m_maxSize;
     m_lastItemIndex = queue.m_lastItemIndex;
-    try {
-        for (int i = 0; i < m_maxSize; i++) {
+    try 
+    {
+        for (int i = 0; i < m_maxSize; i++) 
+        {
             m_data[i] = queue.m_data[i];
             //need check with michal
         }
     }
-    catch (...) {
+    catch (...) 
+    {
         delete[] m_data;
         throw;
     }
-    return *this;
 }
 
 
@@ -140,9 +134,8 @@ Queue Queue::filter(Queue &queue, FilterFunc filterFunc) {
 void Queue::transform(Queue &queue, Transform transformOperator) {
     // what if given queue smaller
     for (int i = 0; i < queue.m_lastItemIndex; ++i) {
-        queue = transformOperator(queue.m_data[i]);
+        queue.m_data[i] = transformOperator(queue.m_data[i]);
     }
-    return queue;
 }
 
 Queue::~Queue() {
