@@ -3,39 +3,43 @@
 typedef int T;
 const int EXPAND_RATE = 2;
 const int INITIAL_SIZE = 10;
+const double MINIMIZE_RATE = 0.75;
 //template <class T>
 class Queue 
 {
     public:
-        class Const_Iterator;
-        class Iterator;
-
-        Iterator begin() const;
-        Iterator end() const;
-        Const_Iterator const_begin() const;
-        Const_Iterator const_end() const;
-        void pushBack(const T itemToPush);
-        void expand();
-        int size() const;
-        T front() const;
-        void popFront();
-        void moveOneLeft();
-        void minimize();
+        
         explicit Queue();
         Queue(const Queue &queue);
         Queue &operator=(const Queue &queue);
+        ~Queue();
+        
+        void pushBack(const T item);
+        int size() const;
+        T front() const;
+        void popFront();
         Queue filter(Queue &queue, FilterFunc filterFunc);
         void transform(Queue &queue, Transform transformOperator);
-        ~Queue(); //need to be done
-
         class EmptyQueue {};
-        class InvalidSize {};
         class InvalidOperation{};
+
+        class Const_Iterator;
+        class Iterator;
+        Iterator begin();
+        Iterator end();
+        Const_Iterator const_begin() const;
+        Const_Iterator const_end() const;
 
     private:
         T *m_data;
         int m_lastItemIndex;
         int m_maxSize;
+        //expand the queue when there's no space left
+        void expand();
+        void moveOneLeft();
+        //free 25% of the space allocated when only half is used
+        void minimize();
+
 };
 
 class Queue::Const_Iterator

@@ -1,80 +1,5 @@
 #include "Queue.h"
 
-
-///////
-//template <class T>
-void Queue::pushBack(const T itemToPush) 
-{
-    // if item == null ?
-    if (m_lastItemIndex >= m_maxSize) {
-        expand();
-    }
-    m_data[m_lastItemIndex] = itemToPush;
-    m_lastItemIndex++;
-}
-
-//<template class T>
-void Queue::expand() 
-{
-    int newSize = m_maxSize * EXPAND_RATE;
-    T *tempData = new T[newSize];
-    try {
-        for (int i = 0; i < m_maxSize; ++i) {
-            tempData[i] = m_data[i];
-        }
-    }
-    catch (...) {
-        delete[] tempData;
-        throw;
-    }
-    delete[] m_data;
-    m_data = tempData;
-    m_maxSize = newSize;
-}
-
-//<template class T>
-int Queue::size() const 
-{
-    return m_maxSize;
-}
-
-//<template class T>
-T Queue::front() const 
-{
-    return m_data[m_lastItemIndex - 1];
-}
-
-
-//<template class T>
-void Queue::popFront() {
-    if (m_lastItemIndex == 0) 
-    {
-        throw EmptyQueue();
-    }
-    moveOneLeft();
-    if (m_lastItemIndex - 1 <= 0.5 * m_maxSize) 
-    {
-        minimize();
-    }
-}
-
-void Queue::moveOneLeft() 
-{
-    for (int i = 0; i < m_lastItemIndex - 1; ++i) 
-    {
-        m_data[i] = m_data[i + 1];
-    }
-    m_lastItemIndex--;
-}
-
-void Queue::minimize() {
-    // when we use less than half of data space we minimize by 25%
-    // given size: 100, when used spaces gets to 49 we minimize size to 75
-    delete[] (m_data+(int)(m_maxSize * 0.75));
-    m_maxSize = m_maxSize * 0.75;
-}
-
-
 //template <class T>
 //Queue<T>::Queue(int size) {
 Queue::Queue() {
@@ -105,20 +30,24 @@ Queue::Queue(const Queue &queue)
     }
 }
 
-
 //template <class T>
-Queue& Queue::operator=(const Queue &queue) {
-    if (this == &queue) {
+Queue& Queue::operator=(const Queue &queue)
+{
+    if (this == &queue) 
+    {
         return *this;
     }
     T *tempData = new T[queue.m_maxSize];
-    try {
+    try 
+    {
         m_maxSize = queue.m_maxSize;
         m_lastItemIndex = queue.m_lastItemIndex;
-        for (int i = 0; i < m_maxSize; ++i) {
+        for (int i = 0; i < m_lastItemIndex; ++i) 
+        {
             m_data[i] = queue.m_data[i];
         }
-    } catch (...) {
+    } catch (...) 
+    {
         delete[] tempData;
         throw;
     }
@@ -126,66 +55,89 @@ Queue& Queue::operator=(const Queue &queue) {
     m_data = tempData;
     return *this;
 }
-    Queue::Const_Iterator::Const_Iterator(const Queue* queue, int index) : 
-        m_queue(queue), m_index(index){}
 
-    const T& Queue::Const_Iterator::operator*()
-    {
-        if (m_index>=m_queue->m_lastItemIndex)
-        {
-            throw InvalidOperation();
-        }
-        return m_queue->m_data[m_index];
-    }
-    Queue::Const_Iterator& Queue::Const_Iterator::operator++()
-    {
-        ++m_index;
-        if (m_index>=m_queue->m_lastItemIndex)
-        {
-            throw InvalidOperation();
-        }
-        return *this;
-    }
-    bool Queue::Const_Iterator::operator!=(const Const_Iterator it) const
-    {
-        if(m_queue!=it.m_queue)
-        {
-            throw InvalidOperation();
-        }
-        return m_index!=it.m_index;
-    }
+Queue::~Queue() 
+{
+    delete[] m_data;
+}
 
-    Queue::Iterator::Iterator(const Queue* queue, int index) : 
-        m_queue(queue), m_index(index){}
 
-    T& Queue::Iterator::operator*()
+///////
+//template <class T>
+void Queue::pushBack(const T item) 
+{
+    // if item == null ?
+    if (m_lastItemIndex >= m_maxSize) 
     {
-        if (m_index>=m_queue->m_lastItemIndex)
-        {
-            throw InvalidOperation();
-        }
-        return m_queue->m_data[m_index];
+        expand();
     }
-    Queue::Iterator& Queue::Iterator::operator++()
-    {
-        ++m_index;
-        if (m_index>=m_queue->m_lastItemIndex)
-        {
-            throw InvalidOperation();
-        }
-        return *this;
-    }
-    bool Queue::Iterator::operator!=(const Iterator it) const
-    {
-        if(m_queue!=it.m_queue)
-        {
-            throw InvalidOperation();
-        }
-        return m_index!=it.m_index;
-    }
-    
+    m_data[m_lastItemIndex] = item;
+    m_lastItemIndex++;
+}
 
-    
+//<template class T>
+void Queue::expand() 
+{
+    int newSize = m_maxSize * EXPAND_RATE;
+    T *tempData = new T[newSize];
+    try 
+    {
+        for (int i = 0; i < m_maxSize; ++i) 
+        {
+            tempData[i] = m_data[i];
+        }
+    }
+    catch (...) 
+    {
+        delete[] tempData;
+        throw;
+    }
+    delete[] m_data;
+    m_data = tempData;
+    m_maxSize = newSize;
+}
+
+//<template class T>
+int Queue::size() const 
+{
+    return m_lastItemIndex;
+}
+
+//<template class T>
+T Queue::front() const 
+{
+    return m_data[m_lastItemIndex - 1];
+}
+
+
+//<template class T>
+void Queue::popFront() 
+{
+    if (m_lastItemIndex == 0) 
+    {
+        throw EmptyQueue();
+    }
+    moveOneLeft();
+    if (m_lastItemIndex - 1 <= 0.5 * m_maxSize) 
+    {
+        minimize();
+    }
+}
+
+void Queue::moveOneLeft() 
+{
+    for (int i = 0; i < m_lastItemIndex - 1; ++i) 
+    {
+        m_data[i] = m_data[i + 1];
+    }
+    m_lastItemIndex--;
+}
+
+void Queue::minimize() 
+{
+    delete[] (m_data+(int)(m_maxSize * MINIMIZE_RATE));
+    m_maxSize = m_maxSize * MINIMIZE_RATE;
+} 
 
 Queue Queue::filter(Queue &queue, FilterFunc filterFunc) {
     // what if given queue smaller
@@ -205,8 +157,84 @@ void Queue::transform(Queue &queue, Transform transformOperator) {
     }
 }
 
-Queue::~Queue() {
-    delete[] m_data;
-};
+Queue::Const_Iterator Queue::const_begin() const
+{
+    return Const_Iterator(this, 0);
+}
 
+Queue::Const_Iterator Queue::const_end() const
+{
+    return Const_Iterator(this, m_lastItemIndex);
+}
 
+Queue::Iterator Queue::begin()
+{
+    return Iterator(this, 0);
+}
+
+Queue::Iterator Queue::end()
+{
+    return Iterator(this, m_lastItemIndex);
+}
+
+Queue::Const_Iterator::Const_Iterator(const Queue* queue, int index) : 
+    m_queue(queue), m_index(index){}
+
+const T& Queue::Const_Iterator::operator*()
+{
+    if (m_index>=m_queue->m_lastItemIndex)
+    {
+        throw InvalidOperation();
+    }
+    return m_queue->m_data[m_index];
+}
+
+Queue::Const_Iterator& Queue::Const_Iterator::operator++()
+{
+    ++m_index;
+    if (m_index>=m_queue->m_lastItemIndex)
+    {
+        throw InvalidOperation();
+    }
+    return *this;
+}
+
+bool Queue::Const_Iterator::operator!=(const Const_Iterator it) const
+{
+    if(m_queue!=it.m_queue)
+    {
+        throw InvalidOperation();
+    }
+    return m_index!=it.m_index;
+}
+
+Queue::Iterator::Iterator(Queue* queue, int index) : 
+    m_queue(queue), m_index(index){}
+
+T& Queue::Iterator::operator*()
+{
+    if (m_index>=m_queue->m_lastItemIndex)
+    {
+        throw InvalidOperation();
+    }
+    return m_queue->m_data[m_index];
+}
+
+Queue::Iterator& Queue::Iterator::operator++()
+{
+    ++m_index;
+    if (m_index>=m_queue->m_lastItemIndex)
+    {
+        throw InvalidOperation();
+    }
+    return *this;
+}
+
+bool Queue::Iterator::operator!=(const Iterator it) const
+{
+    if(m_queue!=it.m_queue)
+    {
+        throw InvalidOperation();
+    }
+    return m_index!=it.m_index;
+}
