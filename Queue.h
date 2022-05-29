@@ -5,46 +5,48 @@ const int EXPAND_RATE = 2;
 const int INITIAL_SIZE = 10;
 const double MINIMIZE_RATE = 0.75;
 //template <class T>
-class Queue 
+class Queue
 {
-    public:
-        
-        explicit Queue();
-        Queue(const Queue &queue);
-        Queue &operator=(const Queue &queue);
-        ~Queue();
-        
-        void pushBack(const T item);
-        int size() const;
-        T front() const;
-        void popFront();
-        Queue filter(Queue &queue, FilterFunc filterFunc);
-        void transform(Queue &queue, Transform transformOperator);
-        class EmptyQueue {};
-        class InvalidOperation{};
+public:
 
-        class Const_Iterator;
-        class Iterator;
-        Iterator begin();
-        Iterator end();
-        Const_Iterator const_begin() const;
-        Const_Iterator const_end() const;
+    Queue();
+    Queue(const Queue &queue);
+    Queue &operator=(const Queue &queue);
+    ~Queue();
 
-    private:
-        T *m_data;
-        int m_lastItemIndex;
-        int m_maxSize;
-        //expand the queue when there's no space left
-        void expand();
-        void moveOneLeft();
-        //free 25% of the space allocated when only half is used
-        void minimize();
+    void pushBack(const T item);
+    int size() const;
+    T front() const;
+    void popFront();
+    typedef bool (*FilterFunc)(T);
+    typedef void (*Transform)(T&);
+    Queue filter(Queue &queue, FilterFunc filterFunc);
+    void transform(Queue &queue, Transform transformOperator);
+    class EmptyQueue {};
+    class InvalidOperation{};
+
+    class Const_Iterator;
+    class Iterator;
+    Iterator begin();
+    Iterator end();
+    Const_Iterator const_begin() const;
+    Const_Iterator const_end() const;
+
+private:
+    T *m_data;
+    int m_lastItemIndex;
+    int m_maxSize;
+    //expand the queue when there's no space left
+    void expand();
+    void moveOneLeft();
+    //free 25% of the space allocated when only half is used
+    void minimize();
 
 };
 
 class Queue::Const_Iterator
 {
-    public:
+public:
     const T& operator*();
     Const_Iterator& operator++();
     bool operator!=(const Const_Iterator it) const;
@@ -52,7 +54,7 @@ class Queue::Const_Iterator
     Const_Iterator& operator=(const Const_Iterator&) = default;
     ~Const_Iterator() = default;
 
-    private:
+private:
     const Queue* m_queue;
     int m_index;
     Const_Iterator (const Queue* queue, int index);
@@ -61,7 +63,7 @@ class Queue::Const_Iterator
 
 class Queue::Iterator
 {
-    public:
+public:
     T& operator*();
     Iterator& operator++();
     bool operator!=(const Iterator it) const;
@@ -69,12 +71,11 @@ class Queue::Iterator
     Iterator& operator=(const Iterator&) = default;
     ~Iterator() = default;
 
-    private:
+private:
     Queue* m_queue;
     int m_index;
     Iterator (Queue* queue, int index);
     friend class Queue;
-    
+
 };
 #endif //EX3_QUEUE_H
-
